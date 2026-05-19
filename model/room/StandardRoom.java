@@ -1,3 +1,5 @@
+package model.room;
+
 public class StandardRoom extends Room {
     private boolean balcony;
 

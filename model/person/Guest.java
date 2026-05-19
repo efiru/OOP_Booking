@@ -1,3 +1,5 @@
+package model.person;
+
 public class Guest extends Person {
     private int loyaltyPoints;
 

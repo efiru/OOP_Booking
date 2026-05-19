@@ -1,3 +1,5 @@
+package model.room;
+
 public abstract class Room {
     private int id;
     private String number;

@@ -1,3 +1,7 @@
+package model.payment;
+
+import model.booking.Booking;
+
 public class Payment {
     private int id;
     private Booking booking;

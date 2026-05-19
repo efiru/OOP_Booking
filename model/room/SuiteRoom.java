@@ -1,3 +1,5 @@
+package model.room;
+
 public class SuiteRoom extends Room {
     private boolean livingArea;
 

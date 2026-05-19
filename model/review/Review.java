@@ -1,3 +1,8 @@
+package model.review;
+
+import model.hotel.Hotel;
+import model.person.Guest;
+
 public class Review {
     private int id;
     private Guest guest;

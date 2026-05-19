@@ -1,3 +1,9 @@
+package model.booking;
+
+import model.hotel.Hotel;
+import model.person.Guest;
+import model.room.Room;
+
 import java.time.LocalDate;
 
 public class Booking {

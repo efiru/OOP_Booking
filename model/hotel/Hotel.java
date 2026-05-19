@@ -1,3 +1,7 @@
+package model.hotel;
+
+import model.room.Room;
+
 import java.util.ArrayList;
 import java.util.List;
 
