@@ -69,6 +69,10 @@ public class Booking {
         return room.getPricePerNight() * nights;
     }
 
+    public double getTotalPrice() {
+        return calculateTotalPrice();
+    }
+
     @Override
     public String toString() {
         return "Booking{id=" + id + ", guest=" + guest.getName() + ", hotel=" + hotel.getName()
