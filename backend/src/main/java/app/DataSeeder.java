@@ -37,6 +37,10 @@ public class DataSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
+        if (!hotelService.getAllHotels().isEmpty()) {
+            return;
+        }
+
         Hotel h1 = hotelService.addHotel("Central Stay", "Bucuresti", 4);
         Hotel h2 = hotelService.addHotel("Mountain View", "Brasov", 3);
         Hotel h3 = hotelService.addHotel("City Lights", "Cluj", 5);

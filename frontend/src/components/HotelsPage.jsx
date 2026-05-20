@@ -4,6 +4,7 @@ import { Button } from './ui/Button'
 import { Input } from './ui/Input'
 import { Label } from './ui/Label'
 import { Badge } from './ui/Badge'
+import HotelSelect from './HotelSelect'
 
 export default function HotelsPage() {
   const [hotels, setHotels] = useState([])
@@ -113,7 +114,7 @@ export default function HotelsPage() {
                         <div className="flex flex-wrap gap-2">
                           {rooms.map(r => (
                             <span key={r.id} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs">
-                              <span className="font-medium">#{r.number}</span> · {r.roomType} · {r.capacity} pers. · {r.pricePerNight} RON/noapte ·{' '}
+                              <span className="font-medium">#{r.number}</span> <span className="text-slate-400">(ID: {r.id})</span> · {r.roomType} · {r.capacity} pers. · {r.pricePerNight} RON/noapte ·{' '}
                               <Badge variant={r.available ? 'success' : 'destructive'}>{r.available ? 'Disponibil' : 'Ocupat'}</Badge>
                             </span>
                           ))}
@@ -145,7 +146,7 @@ export default function HotelsPage() {
           <CardHeader><CardTitle>Adaugă cameră standard</CardTitle></CardHeader>
           <CardContent>
             <form onSubmit={addStandardRoom} className="space-y-3">
-              <div><Label>ID Hotel</Label><Input type="number" value={standardRoomForm.hotelId} onChange={e => setStandardRoomForm({ ...standardRoomForm, hotelId: e.target.value })} required /></div>
+              <div><Label>Hotel</Label><HotelSelect value={standardRoomForm.hotelId} onChange={id => setStandardRoomForm({ ...standardRoomForm, hotelId: id })} /></div>
               <div><Label>Număr cameră</Label><Input value={standardRoomForm.number} onChange={e => setStandardRoomForm({ ...standardRoomForm, number: e.target.value })} required /></div>
               <div><Label>Capacitate</Label><Input type="number" value={standardRoomForm.capacity} onChange={e => setStandardRoomForm({ ...standardRoomForm, capacity: e.target.value })} required /></div>
               <div><Label>Preț / noapte (RON)</Label><Input type="number" value={standardRoomForm.pricePerNight} onChange={e => setStandardRoomForm({ ...standardRoomForm, pricePerNight: e.target.value })} required /></div>
@@ -159,7 +160,7 @@ export default function HotelsPage() {
           <CardHeader><CardTitle>Adaugă cameră suite</CardTitle></CardHeader>
           <CardContent>
             <form onSubmit={addSuiteRoom} className="space-y-3">
-              <div><Label>ID Hotel</Label><Input type="number" value={suiteRoomForm.hotelId} onChange={e => setSuiteRoomForm({ ...suiteRoomForm, hotelId: e.target.value })} required /></div>
+              <div><Label>Hotel</Label><HotelSelect value={suiteRoomForm.hotelId} onChange={id => setSuiteRoomForm({ ...suiteRoomForm, hotelId: id })} /></div>
               <div><Label>Număr cameră</Label><Input value={suiteRoomForm.number} onChange={e => setSuiteRoomForm({ ...suiteRoomForm, number: e.target.value })} required /></div>
               <div><Label>Capacitate</Label><Input type="number" value={suiteRoomForm.capacity} onChange={e => setSuiteRoomForm({ ...suiteRoomForm, capacity: e.target.value })} required /></div>
               <div><Label>Preț / noapte (RON)</Label><Input type="number" value={suiteRoomForm.pricePerNight} onChange={e => setSuiteRoomForm({ ...suiteRoomForm, pricePerNight: e.target.value })} required /></div>

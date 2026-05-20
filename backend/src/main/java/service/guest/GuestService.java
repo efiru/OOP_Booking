@@ -1,31 +1,30 @@
 package service.guest;
 
 import model.person.Guest;
+import repository.guest.GuestDao;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class GuestService implements IGuestService {
-    private final Map<Integer, Guest> guests = new HashMap<>();
-    private int nextGuestId = 1;
+    private final GuestDao guestDao;
+
+    public GuestService(GuestDao guestDao) {
+        this.guestDao = guestDao;
+    }
 
     @Override
     public Guest registerGuest(String name, String email) {
-        Guest guest = new Guest(nextGuestId++, name, email, 0);
-        guests.put(guest.getId(), guest);
-        return guest;
+        return guestDao.insert(new Guest(0, name, email, 0));
     }
 
     @Override
     public List<Guest> getAllGuests() {
-        return new ArrayList<>(guests.values());
+        return guestDao.findAll();
     }
 
     @Override
     public Guest getGuest(int guestId) {
-        Guest guest = guests.get(guestId);
+        Guest guest = guestDao.findById(guestId);
         if (guest == null) {
             throw new IllegalArgumentException("Nu exista client cu id-ul " + guestId + ".");
         }

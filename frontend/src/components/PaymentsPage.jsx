@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/Card'
 import { Button } from './ui/Button'
-import { Input } from './ui/Input'
 import { Label } from './ui/Label'
+import BookingSelect from './BookingSelect'
 
 export default function PaymentsPage() {
   const [form, setForm] = useState({ bookingId: '', method: '' })
@@ -31,7 +31,7 @@ export default function PaymentsPage() {
           <CardHeader><CardTitle>Înregistrează plată</CardTitle></CardHeader>
           <CardContent>
             <form onSubmit={registerPayment} className="space-y-3">
-              <div><Label>ID Rezervare</Label><Input type="number" value={form.bookingId} onChange={e => setForm({ ...form, bookingId: e.target.value })} required /></div>
+              <div><Label>Rezervare</Label><BookingSelect value={form.bookingId} onChange={id => setForm({ ...form, bookingId: id })} /></div>
               <div>
                 <Label>Metodă plată</Label>
                 <select value={form.method} onChange={e => setForm({ ...form, method: e.target.value })} required className="flex h-9 w-full rounded-md border border-slate-300 bg-white px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-900">

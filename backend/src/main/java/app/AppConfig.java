@@ -4,6 +4,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import repository.booking.BookingDao;
+import repository.guest.GuestDao;
+import repository.hotel.HotelDao;
+import repository.room.RoomDao;
 import service.booking.BookingService;
 import service.booking.IBookingService;
 import service.employee.EmployeeService;
@@ -21,13 +25,33 @@ import service.review.ReviewService;
 public class AppConfig {
 
     @Bean
-    public IHotelService hotelService() {
-        return new HotelService();
+    public HotelDao hotelDao() {
+        return new HotelDao();
     }
 
     @Bean
-    public IGuestService guestService() {
-        return new GuestService();
+    public GuestDao guestDao() {
+        return new GuestDao();
+    }
+
+    @Bean
+    public RoomDao roomDao() {
+        return new RoomDao();
+    }
+
+    @Bean
+    public BookingDao bookingDao(GuestDao guestDao, HotelDao hotelDao, RoomDao roomDao) {
+        return new BookingDao(guestDao, hotelDao, roomDao);
+    }
+
+    @Bean
+    public IHotelService hotelService(HotelDao hotelDao, RoomDao roomDao) {
+        return new HotelService(hotelDao, roomDao);
+    }
+
+    @Bean
+    public IGuestService guestService(GuestDao guestDao) {
+        return new GuestService(guestDao);
     }
 
     @Bean
@@ -36,8 +60,8 @@ public class AppConfig {
     }
 
     @Bean
-    public IBookingService bookingService(IHotelService hotelService, IGuestService guestService) {
-        return new BookingService(hotelService, guestService);
+    public IBookingService bookingService(BookingDao bookingDao, HotelDao hotelDao, RoomDao roomDao, GuestDao guestDao) {
+        return new BookingService(bookingDao, hotelDao, roomDao, guestDao);
     }
 
     @Bean

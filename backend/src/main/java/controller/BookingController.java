@@ -18,8 +18,9 @@ public class BookingController {
     }
 
     @GetMapping
-    public List<Booking> getBookings(@RequestParam int guestId) {
-        return bookingService.getBookingsForGuest(guestId);
+    public List<Booking> getBookings(@RequestParam(required = false) Integer guestId) {
+        if (guestId != null) return bookingService.getBookingsForGuest(guestId);
+        return bookingService.getAllBookings();
     }
 
     @PostMapping

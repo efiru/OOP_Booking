@@ -4,52 +4,51 @@ import model.hotel.Hotel;
 import model.room.Room;
 import model.room.StandardRoom;
 import model.room.SuiteRoom;
+import repository.hotel.HotelDao;
+import repository.room.RoomDao;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeSet;
 
 public class HotelService implements IHotelService {
-    private final TreeSet<Hotel> hotels = new TreeSet<>();
-    private final Map<Integer, Hotel> hotelById = new HashMap<>();
-    private int nextHotelId = 1;
-    private int nextRoomId = 1;
+    private final HotelDao hotelDao;
+    private final RoomDao roomDao;
+
+    public HotelService(HotelDao hotelDao, RoomDao roomDao) {
+        this.hotelDao = hotelDao;
+        this.roomDao = roomDao;
+    }
 
     @Override
     public Hotel addHotel(String name, String city, int stars) {
-        Hotel hotel = new Hotel(nextHotelId++, name, city, stars);
-        hotels.add(hotel);
-        hotelById.put(hotel.getId(), hotel);
-        return hotel;
+        return hotelDao.insert(new Hotel(0, name, city, stars));
     }
 
     @Override
     public Room addStandardRoom(int hotelId, String number, int capacity, double pricePerNight, boolean balcony) {
-        Hotel hotel = getHotel(hotelId);
-        Room room = new StandardRoom(nextRoomId++, number, capacity, pricePerNight, true, balcony);
-        hotel.addRoom(room);
-        return room;
+        getHotel(hotelId);
+        return roomDao.insert(hotelId, new StandardRoom(0, number, capacity, pricePerNight, true, balcony));
     }
 
     @Override
     public Room addSuiteRoom(int hotelId, String number, int capacity, double pricePerNight, boolean livingArea) {
-        Hotel hotel = getHotel(hotelId);
-        Room room = new SuiteRoom(nextRoomId++, number, capacity, pricePerNight, true, livingArea);
-        hotel.addRoom(room);
-        return room;
+        getHotel(hotelId);
+        return roomDao.insert(hotelId, new SuiteRoom(0, number, capacity, pricePerNight, true, livingArea));
     }
 
     @Override
     public List<Hotel> getAllHotels() {
-        return new ArrayList<>(hotels);
+        List<Hotel> hotels = hotelDao.findAll();
+        for (Hotel hotel : hotels) {
+            loadRooms(hotel);
+        }
+        return hotels;
     }
 
     @Override
     public List<Hotel> findHotelsByCity(String city) {
         List<Hotel> result = new ArrayList<>();
-        for (Hotel hotel : hotels) {
+        for (Hotel hotel : getAllHotels()) {
             if (hotel.getCity().equalsIgnoreCase(city)) {
                 result.add(hotel);
             }
@@ -59,23 +58,25 @@ public class HotelService implements IHotelService {
 
     @Override
     public Hotel getHotel(int hotelId) {
-        Hotel hotel = hotelById.get(hotelId);
+        Hotel hotel = hotelDao.findById(hotelId);
         if (hotel == null) {
             throw new IllegalArgumentException("Nu exista hotel cu id-ul " + hotelId + ".");
         }
+        loadRooms(hotel);
         return hotel;
     }
 
     @Override
     public List<Room> getRoomsForHotel(int hotelId) {
-        return new ArrayList<>(getHotel(hotelId).getRooms());
+        getHotel(hotelId);
+        return roomDao.findAllByHotelId(hotelId);
     }
 
     @Override
     public List<Room> getAvailableRoomsUnderPrice(double maxPrice) {
         List<Room> result = new ArrayList<>();
-        for (Hotel hotel : hotels) {
-            for (Room room : hotel.getRooms()) {
+        for (Hotel hotel : hotelDao.findAll()) {
+            for (Room room : roomDao.findAllByHotelId(hotel.getId())) {
                 if (room.isAvailable() && room.getPricePerNight() <= maxPrice) {
                     result.add(room);
                 }
@@ -87,8 +88,8 @@ public class HotelService implements IHotelService {
     @Override
     public List<String> getAvailableRoomDescriptionsUnderPrice(double maxPrice) {
         List<String> result = new ArrayList<>();
-        for (Hotel hotel : hotels) {
-            for (Room room : hotel.getRooms()) {
+        for (Hotel hotel : hotelDao.findAll()) {
+            for (Room room : roomDao.findAllByHotelId(hotel.getId())) {
                 if (room.isAvailable() && room.getPricePerNight() <= maxPrice) {
                     result.add("Hotel " + hotel.getName() + " (" + hotel.getCity() + ") - " + room);
                 }
@@ -99,12 +100,17 @@ public class HotelService implements IHotelService {
 
     @Override
     public Room getRoomInHotel(int hotelId, int roomId) {
-        Hotel hotel = getHotel(hotelId);
-        for (Room room : hotel.getRooms()) {
+        for (Room room : roomDao.findAllByHotelId(hotelId)) {
             if (room.getId() == roomId) {
                 return room;
             }
         }
         throw new IllegalArgumentException("Nu exista camera cu id-ul " + roomId + " in hotelul selectat.");
+    }
+
+    private void loadRooms(Hotel hotel) {
+        for (Room room : roomDao.findAllByHotelId(hotel.getId())) {
+            hotel.addRoom(room);
+        }
     }
 }

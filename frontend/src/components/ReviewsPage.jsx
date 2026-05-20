@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/Card'
 import { Button } from './ui/Button'
 import { Input } from './ui/Input'
 import { Label } from './ui/Label'
+import HotelSelect from './HotelSelect'
+import GuestSelect from './GuestSelect'
 
 export default function ReviewsPage() {
   const [reviews, setReviews] = useState([])
@@ -40,8 +42,8 @@ export default function ReviewsPage() {
           <CardHeader><CardTitle>Adaugă review</CardTitle></CardHeader>
           <CardContent>
             <form onSubmit={addReview} className="space-y-3">
-              <div><Label>ID Client</Label><Input type="number" value={form.guestId} onChange={e => setForm({ ...form, guestId: e.target.value })} required /></div>
-              <div><Label>ID Hotel</Label><Input type="number" value={form.hotelId} onChange={e => setForm({ ...form, hotelId: e.target.value })} required /></div>
+              <div><Label>Client</Label><GuestSelect value={form.guestId} onChange={id => setForm({ ...form, guestId: id })} /></div>
+              <div><Label>Hotel</Label><HotelSelect value={form.hotelId} onChange={id => setForm({ ...form, hotelId: id })} /></div>
               <div><Label>Stele (1-5)</Label><Input type="number" min="1" max="5" value={form.stars} onChange={e => setForm({ ...form, stars: e.target.value })} required /></div>
               <div><Label>Comentariu</Label><textarea value={form.comment} onChange={e => setForm({ ...form, comment: e.target.value })} required rows={3} className="flex w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900" /></div>
               <Button type="submit" className="w-full">Adaugă review</Button>
@@ -54,7 +56,7 @@ export default function ReviewsPage() {
             <CardHeader>
               <CardTitle>Review-uri hotel</CardTitle>
               <div className="flex gap-2 pt-2">
-                <Input type="number" placeholder="ID hotel..." value={hotelIdSearch} onChange={e => setHotelIdSearch(e.target.value)} className="max-w-xs" />
+                <div className="max-w-xs w-full"><HotelSelect value={hotelIdSearch} onChange={id => setHotelIdSearch(id)} /></div>
                 <Button onClick={loadReviews}>Caută</Button>
               </div>
             </CardHeader>

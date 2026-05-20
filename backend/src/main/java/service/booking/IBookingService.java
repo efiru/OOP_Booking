@@ -8,6 +8,7 @@ import java.util.List;
 public interface IBookingService {
     Booking createBooking(int guestId, int hotelId, int roomId, LocalDate checkInDate, int nights);
     boolean cancelBooking(int bookingId);
+    List<Booking> getAllBookings();
     List<Booking> getBookingsForGuest(int guestId);
     Booking getBooking(int bookingId);
 }

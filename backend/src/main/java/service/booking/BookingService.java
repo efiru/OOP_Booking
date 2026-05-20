@@ -5,22 +5,25 @@ import model.booking.BookingStatus;
 import model.hotel.Hotel;
 import model.person.Guest;
 import model.room.Room;
-import service.guest.IGuestService;
-import service.hotel.IHotelService;
+import repository.booking.BookingDao;
+import repository.guest.GuestDao;
+import repository.hotel.HotelDao;
+import repository.room.RoomDao;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 public class BookingService implements IBookingService {
-    private final IHotelService hotelService;
-    private final IGuestService guestService;
-    private final List<Booking> bookings = new ArrayList<>();
-    private int nextBookingId = 1;
+    private final BookingDao bookingDao;
+    private final HotelDao hotelDao;
+    private final RoomDao roomDao;
+    private final GuestDao guestDao;
 
-    public BookingService(IHotelService hotelService, IGuestService guestService) {
-        this.hotelService = hotelService;
-        this.guestService = guestService;
+    public BookingService(BookingDao bookingDao, HotelDao hotelDao, RoomDao roomDao, GuestDao guestDao) {
+        this.bookingDao = bookingDao;
+        this.hotelDao = hotelDao;
+        this.roomDao = roomDao;
+        this.guestDao = guestDao;
     }
 
     @Override
@@ -29,51 +32,67 @@ public class BookingService implements IBookingService {
             throw new IllegalArgumentException("Numarul de nopti trebuie sa fie pozitiv.");
         }
 
-        Guest guest = guestService.getGuest(guestId);
-        Hotel hotel = hotelService.getHotel(hotelId);
-        Room room = hotelService.getRoomInHotel(hotelId, roomId);
+        Guest guest = guestDao.findById(guestId);
+        if (guest == null) throw new IllegalArgumentException("Nu exista client cu id-ul " + guestId + ".");
 
-        if (!room.isAvailable()) {
-            throw new IllegalArgumentException("Camera selectata nu este disponibila.");
-        }
+        Hotel hotel = hotelDao.findById(hotelId);
+        if (hotel == null) throw new IllegalArgumentException("Nu exista hotel cu id-ul " + hotelId + ".");
 
-        Booking booking = new Booking(nextBookingId++, guest, hotel, room, checkInDate, nights, BookingStatus.CONFIRMED);
-        bookings.add(booking);
+        Room room = findRoomInHotel(hotelId, roomId);
+        if (!room.isAvailable()) throw new IllegalArgumentException("Camera selectata nu este disponibila.");
+
+        Booking booking = bookingDao.insert(new Booking(0, guest, hotel, room, checkInDate, nights, BookingStatus.CONFIRMED));
+
         room.setAvailable(false);
+        roomDao.update(room);
+
         guest.setLoyaltyPoints(guest.getLoyaltyPoints() + nights * 10);
+        guestDao.update(guest);
+
         return booking;
     }
 
     @Override
     public boolean cancelBooking(int bookingId) {
-        for (Booking booking : bookings) {
-            if (booking.getId() == bookingId && booking.getStatus() == BookingStatus.CONFIRMED) {
-                booking.setStatus(BookingStatus.CANCELLED);
-                booking.getRoom().setAvailable(true);
-                return true;
-            }
+        Booking booking = bookingDao.findById(bookingId);
+        if (booking == null || booking.getStatus() != BookingStatus.CONFIRMED) {
+            return false;
         }
-        return false;
+        booking.setStatus(BookingStatus.CANCELLED);
+        bookingDao.update(booking);
+
+        Room room = booking.getRoom();
+        room.setAvailable(true);
+        roomDao.update(room);
+
+        return true;
+    }
+
+    @Override
+    public List<Booking> getAllBookings() {
+        return bookingDao.findAll();
     }
 
     @Override
     public List<Booking> getBookingsForGuest(int guestId) {
-        List<Booking> result = new ArrayList<>();
-        for (Booking booking : bookings) {
-            if (booking.getGuest().getId() == guestId) {
-                result.add(booking);
-            }
-        }
-        return result;
+        return bookingDao.findAllByGuestId(guestId);
     }
 
     @Override
     public Booking getBooking(int bookingId) {
-        for (Booking booking : bookings) {
-            if (booking.getId() == bookingId) {
-                return booking;
+        Booking booking = bookingDao.findById(bookingId);
+        if (booking == null) {
+            throw new IllegalArgumentException("Nu exista rezervare cu id-ul " + bookingId + ".");
+        }
+        return booking;
+    }
+
+    private Room findRoomInHotel(int hotelId, int roomId) {
+        for (Room room : roomDao.findAllByHotelId(hotelId)) {
+            if (room.getId() == roomId) {
+                return room;
             }
         }
-        throw new IllegalArgumentException("Nu exista rezervare cu id-ul " + bookingId + ".");
+        throw new IllegalArgumentException("Nu exista camera cu id-ul " + roomId + " in hotelul selectat.");
     }
 }

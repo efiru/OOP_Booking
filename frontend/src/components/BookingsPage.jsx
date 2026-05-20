@@ -4,6 +4,9 @@ import { Button } from './ui/Button'
 import { Input } from './ui/Input'
 import { Label } from './ui/Label'
 import { Badge } from './ui/Badge'
+import HotelSelect from './HotelSelect'
+import GuestSelect from './GuestSelect'
+import RoomSelect from './RoomSelect'
 
 export default function BookingsPage() {
   const [bookings, setBookings] = useState([])
@@ -50,9 +53,9 @@ export default function BookingsPage() {
           <CardHeader><CardTitle>Crează rezervare</CardTitle></CardHeader>
           <CardContent>
             <form onSubmit={createBooking} className="space-y-3">
-              <div><Label>ID Client</Label><Input type="number" value={form.guestId} onChange={e => setForm({ ...form, guestId: e.target.value })} required /></div>
-              <div><Label>ID Hotel</Label><Input type="number" value={form.hotelId} onChange={e => setForm({ ...form, hotelId: e.target.value })} required /></div>
-              <div><Label>ID Cameră</Label><Input type="number" value={form.roomId} onChange={e => setForm({ ...form, roomId: e.target.value })} required /></div>
+              <div><Label>Client</Label><GuestSelect value={form.guestId} onChange={id => setForm({ ...form, guestId: id })} /></div>
+              <div><Label>Hotel</Label><HotelSelect value={form.hotelId} onChange={id => setForm({ ...form, hotelId: id, roomId: '' })} /></div>
+              <div><Label>Cameră</Label><RoomSelect hotelId={form.hotelId} value={form.roomId} onChange={id => setForm({ ...form, roomId: id })} /></div>
               <div><Label>Data check-in</Label><Input type="date" value={form.checkInDate} onChange={e => setForm({ ...form, checkInDate: e.target.value })} required /></div>
               <div><Label>Număr nopți</Label><Input type="number" min="1" value={form.nights} onChange={e => setForm({ ...form, nights: e.target.value })} required /></div>
               <Button type="submit" className="w-full">Rezervă</Button>
@@ -65,7 +68,7 @@ export default function BookingsPage() {
             <CardHeader>
               <CardTitle>Rezervările unui client</CardTitle>
               <div className="flex gap-2 pt-2">
-                <Input type="number" placeholder="ID client..." value={guestIdSearch} onChange={e => setGuestIdSearch(e.target.value)} className="max-w-xs" />
+                <div className="max-w-xs w-full"><GuestSelect value={guestIdSearch} onChange={id => setGuestIdSearch(id)} /></div>
                 <Button onClick={loadBookings}>Caută</Button>
               </div>
             </CardHeader>
