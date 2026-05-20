@@ -10,6 +10,7 @@ import service.audit.AuditService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 
 public class HotelService implements IHotelService {
     private final HotelDao hotelDao;
@@ -45,7 +46,8 @@ public class HotelService implements IHotelService {
     @Override
     public List<Hotel> getAllHotels() {
         auditService.log("getAllHotels");
-        List<Hotel> hotels = hotelDao.findAll();
+        TreeSet<Hotel> sorted = new TreeSet<>(hotelDao.findAll());
+        List<Hotel> hotels = new ArrayList<>(sorted);
         for (Hotel hotel : hotels) {
             loadRooms(hotel);
         }
