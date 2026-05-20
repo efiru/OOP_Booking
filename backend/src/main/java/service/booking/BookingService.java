@@ -9,6 +9,7 @@ import repository.booking.BookingDao;
 import repository.guest.GuestDao;
 import repository.hotel.HotelDao;
 import repository.room.RoomDao;
+import service.audit.AuditService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -18,16 +19,19 @@ public class BookingService implements IBookingService {
     private final HotelDao hotelDao;
     private final RoomDao roomDao;
     private final GuestDao guestDao;
+    private final AuditService auditService;
 
-    public BookingService(BookingDao bookingDao, HotelDao hotelDao, RoomDao roomDao, GuestDao guestDao) {
+    public BookingService(BookingDao bookingDao, HotelDao hotelDao, RoomDao roomDao, GuestDao guestDao, AuditService auditService) {
         this.bookingDao = bookingDao;
         this.hotelDao = hotelDao;
         this.roomDao = roomDao;
         this.guestDao = guestDao;
+        this.auditService = auditService;
     }
 
     @Override
     public Booking createBooking(int guestId, int hotelId, int roomId, LocalDate checkInDate, int nights) {
+        auditService.log("createBooking");
         if (nights <= 0) {
             throw new IllegalArgumentException("Numarul de nopti trebuie sa fie pozitiv.");
         }
@@ -54,6 +58,7 @@ public class BookingService implements IBookingService {
 
     @Override
     public boolean cancelBooking(int bookingId) {
+        auditService.log("cancelBooking");
         Booking booking = bookingDao.findById(bookingId);
         if (booking == null || booking.getStatus() != BookingStatus.CONFIRMED) {
             return false;
@@ -70,16 +75,19 @@ public class BookingService implements IBookingService {
 
     @Override
     public List<Booking> getAllBookings() {
+        auditService.log("getAllBookings");
         return bookingDao.findAll();
     }
 
     @Override
     public List<Booking> getBookingsForGuest(int guestId) {
+        auditService.log("getBookingsForGuest");
         return bookingDao.findAllByGuestId(guestId);
     }
 
     @Override
     public Booking getBooking(int bookingId) {
+        auditService.log("getBooking");
         Booking booking = bookingDao.findById(bookingId);
         if (booking == null) {
             throw new IllegalArgumentException("Nu exista rezervare cu id-ul " + bookingId + ".");

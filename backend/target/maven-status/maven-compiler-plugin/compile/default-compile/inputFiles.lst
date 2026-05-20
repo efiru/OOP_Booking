@@ -14,6 +14,7 @@
 /Users/firu/Documents/OOP/backend/src/main/java/app/DataSeeder.java
 /Users/firu/Documents/OOP/backend/src/main/java/repository/booking/BookingDao.java
 /Users/firu/Documents/OOP/backend/src/main/java/service/hotel/HotelService.java
+/Users/firu/Documents/OOP/backend/src/main/java/service/audit/AuditService.java
 /Users/firu/Documents/OOP/backend/src/main/java/service/guest/GuestService.java
 /Users/firu/Documents/OOP/backend/src/main/java/model/booking/Booking.java
 /Users/firu/Documents/OOP/backend/src/main/java/controller/PaymentController.java
@@ -29,10 +30,12 @@
 /Users/firu/Documents/OOP/backend/src/main/java/model/room/StandardRoom.java
 /Users/firu/Documents/OOP/backend/src/main/java/service/guest/IGuestService.java
 /Users/firu/Documents/OOP/backend/src/main/java/app/Application.java
+/Users/firu/Documents/OOP/backend/src/main/java/repository/payment/PaymentDao.java
 /Users/firu/Documents/OOP/backend/src/main/java/service/booking/IBookingService.java
 /Users/firu/Documents/OOP/backend/src/main/java/app/GlobalExceptionHandler.java
 /Users/firu/Documents/OOP/backend/src/main/java/service/employee/IEmployeeService.java
 /Users/firu/Documents/OOP/backend/src/main/java/model/person/Person.java
+/Users/firu/Documents/OOP/backend/src/main/java/repository/review/ReviewDao.java
 /Users/firu/Documents/OOP/backend/src/main/java/controller/ReviewController.java
 /Users/firu/Documents/OOP/backend/src/main/java/controller/BookingController.java
 /Users/firu/Documents/OOP/backend/src/main/java/service/review/ReviewService.java

@@ -3,45 +3,42 @@ package service.review;
 import model.hotel.Hotel;
 import model.person.Guest;
 import model.review.Review;
-import service.guest.IGuestService;
-import service.hotel.IHotelService;
+import repository.guest.GuestDao;
+import repository.hotel.HotelDao;
+import repository.review.ReviewDao;
+import service.audit.AuditService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ReviewService implements IReviewService {
-    private final IHotelService hotelService;
-    private final IGuestService guestService;
-    private final List<Review> reviews = new ArrayList<>();
-    private int nextReviewId = 1;
+    private final ReviewDao reviewDao;
+    private final GuestDao guestDao;
+    private final HotelDao hotelDao;
+    private final AuditService auditService;
 
-    public ReviewService(IHotelService hotelService, IGuestService guestService) {
-        this.hotelService = hotelService;
-        this.guestService = guestService;
+    public ReviewService(ReviewDao reviewDao, GuestDao guestDao, HotelDao hotelDao, AuditService auditService) {
+        this.reviewDao = reviewDao;
+        this.guestDao = guestDao;
+        this.hotelDao = hotelDao;
+        this.auditService = auditService;
     }
 
     @Override
     public Review addReview(int guestId, int hotelId, int stars, String comment) {
+        auditService.log("addReview");
         if (stars < 1 || stars > 5) {
             throw new IllegalArgumentException("Numarul de stele trebuie sa fie intre 1 si 5.");
         }
-
-        Guest guest = guestService.getGuest(guestId);
-        Hotel hotel = hotelService.getHotel(hotelId);
-        Review review = new Review(nextReviewId++, guest, hotel, stars, comment);
-        reviews.add(review);
-        return review;
+        Guest guest = guestDao.findById(guestId);
+        if (guest == null) throw new IllegalArgumentException("Nu exista client cu id-ul " + guestId + ".");
+        Hotel hotel = hotelDao.findById(hotelId);
+        if (hotel == null) throw new IllegalArgumentException("Nu exista hotel cu id-ul " + hotelId + ".");
+        return reviewDao.insert(new Review(0, guest, hotel, stars, comment));
     }
 
     @Override
     public List<Review> getReviewsForHotel(int hotelId) {
-        Hotel hotel = hotelService.getHotel(hotelId);
-        List<Review> result = new ArrayList<>();
-        for (Review review : reviews) {
-            if (review.getHotel().getId() == hotel.getId()) {
-                result.add(review);
-            }
-        }
-        return result;
+        auditService.log("getReviewsForHotel");
+        return reviewDao.findAllByHotelId(hotelId);
     }
 }

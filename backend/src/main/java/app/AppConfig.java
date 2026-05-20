@@ -7,7 +7,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import repository.booking.BookingDao;
 import repository.guest.GuestDao;
 import repository.hotel.HotelDao;
+import repository.payment.PaymentDao;
+import repository.review.ReviewDao;
 import repository.room.RoomDao;
+import service.audit.AuditService;
 import service.booking.BookingService;
 import service.booking.IBookingService;
 import service.employee.EmployeeService;
@@ -45,33 +48,48 @@ public class AppConfig {
     }
 
     @Bean
-    public IHotelService hotelService(HotelDao hotelDao, RoomDao roomDao) {
-        return new HotelService(hotelDao, roomDao);
+    public AuditService auditService() {
+        return AuditService.getInstance();
     }
 
     @Bean
-    public IGuestService guestService(GuestDao guestDao) {
-        return new GuestService(guestDao);
+    public IHotelService hotelService(HotelDao hotelDao, RoomDao roomDao, AuditService auditService) {
+        return new HotelService(hotelDao, roomDao, auditService);
     }
 
     @Bean
-    public IEmployeeService employeeService() {
-        return new EmployeeService();
+    public IGuestService guestService(GuestDao guestDao, AuditService auditService) {
+        return new GuestService(guestDao, auditService);
     }
 
     @Bean
-    public IBookingService bookingService(BookingDao bookingDao, HotelDao hotelDao, RoomDao roomDao, GuestDao guestDao) {
-        return new BookingService(bookingDao, hotelDao, roomDao, guestDao);
+    public IEmployeeService employeeService(AuditService auditService) {
+        return new EmployeeService(auditService);
     }
 
     @Bean
-    public IPaymentService paymentService(IBookingService bookingService) {
-        return new PaymentService(bookingService);
+    public IBookingService bookingService(BookingDao bookingDao, HotelDao hotelDao, RoomDao roomDao, GuestDao guestDao, AuditService auditService) {
+        return new BookingService(bookingDao, hotelDao, roomDao, guestDao, auditService);
     }
 
     @Bean
-    public IReviewService reviewService(IHotelService hotelService, IGuestService guestService) {
-        return new ReviewService(hotelService, guestService);
+    public PaymentDao paymentDao(BookingDao bookingDao) {
+        return new PaymentDao(bookingDao);
+    }
+
+    @Bean
+    public ReviewDao reviewDao(GuestDao guestDao, HotelDao hotelDao) {
+        return new ReviewDao(guestDao, hotelDao);
+    }
+
+    @Bean
+    public IPaymentService paymentService(PaymentDao paymentDao, BookingDao bookingDao, AuditService auditService) {
+        return new PaymentService(paymentDao, bookingDao, auditService);
+    }
+
+    @Bean
+    public IReviewService reviewService(ReviewDao reviewDao, GuestDao guestDao, HotelDao hotelDao, AuditService auditService) {
+        return new ReviewService(reviewDao, guestDao, hotelDao, auditService);
     }
 
     @Bean
